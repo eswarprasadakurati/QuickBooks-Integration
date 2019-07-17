@@ -1,0 +1,15 @@
+<aura:component controller="QuickbooksItemHandler" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+   <aura:attribute name="Response" type="string"/>
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <aura:handler name="init" action="{!c.SynQBO }" value="{!this}"/>
+    <aura:html tag="style">
+        .slds-modal{
+             display: none;
+         }
+    </aura:html>
+    <aura:if isTrue="{! v.showSpinner }">
+            <lightning:spinner alternativeText="Loading" />
+        </aura:if>
+    <lightning:button label="Send to QuickBooks" onclick="{!c.SynQBO}"/> 
+
+</aura:component>

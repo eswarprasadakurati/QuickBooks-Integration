@@ -1,0 +1,5 @@
+<apex:page controller="QucikbookAuth_Ctrl" lightningStyleSheets="true">
+    <apex:form >
+        <apex:commandbutton value="Quick Books - oAuth" action="{!getOAuth}"/>
+    </apex:form>
+</apex:page>

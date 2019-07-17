@@ -1,0 +1,17 @@
+<aura:component controller="QuickbooksInvoiceHandler" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+	<aura:attribute name="Response" type="string"/>    
+     <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <aura:handler name="init" action="{!c.updateQuickBooksId }" value="{!this}"/>
+    <aura:html tag="style">
+        .slds-modal{
+             display: none;
+         }
+    </aura:html>
+    <aura:if isTrue="{! v.showSpinner }">
+            <lightning:spinner alternativeText="Loading" />
+        </aura:if>
+    <div aura:id="QuickActionPart" class="">
+        <lightning:button variant="brand" label="Sync With QuickBooks" title="Sync With QuickBooks" class="slds-m-left_x-small" onclick="{!c.updateQuickBooksId}"/>
+    </div>
+    
+</aura:component>

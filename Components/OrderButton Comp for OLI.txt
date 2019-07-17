@@ -1,0 +1,82 @@
+<aura:component controller="QuickbooksInvoiceHandler" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="lstlineitems" type="Object[]"/>
+    <aura:attribute name="Response" type="string"/>
+    <aura:attribute name="Selected_LineItems" type="List"/>
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <aura:handler name="init" action="{!c.listAction }" value="{!this}"/>
+    
+	
+    <!--<aura:html tag="style">
+        .slds-modal__container {
+             width : 80% !important;
+             max-width : 80% !important;
+         }
+    </aura:html>-->
+    <aura:if isTrue="{! v.showSpinner }">
+            <lightning:spinner alternativeText="Loading" />
+        </aura:if>
+        <table class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_fixed-layout">
+            <thead>
+                <tr class="slds-text-heading_label">
+                    <th scope="col"><div class="slds-truncate" title="Select">           
+                        <label class="slds-checkbox">
+                            <ui:inputCheckbox value="{!v.isSelectAll}" change="{!c.handleSelectAllLineItems}" aura:id="selectAll"/>
+                            <span class="slds-checkbox--faux" />
+                            <span class="slds-form-element__label"></span>
+                        </label>
+                        </div>
+                    </th>
+                    <th scope="col"><div class="slds-truncate" title="Resource Name">Order Line Item Number</div></th>
+                    <th scope="col"><div class="slds-truncate" title="Image Type">Activation Status</div></th>
+                    <th scope="col"><div class="slds-truncate" title="Image Type">Quick Books Invoice Number</div></th>
+                    <th scope="col"><div class="slds-truncate" title="Image Type">Product</div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.lstlineitems}" var="LineItem" indexVar="index">
+                    <tr>
+                        <th>
+                            <div class="slds-truncate">
+                                <label class="slds-checkbox">
+                                    <ui:inputCheckbox aura:id="checkStudent" value="{!LineItem.check}" text="{!LineItem.Id}" change="{!c.handleSelectedLineItems}"/>
+                                    <span class="slds-checkbox--faux" />
+                                    <span class="slds-form-element__label"></span>
+                                </label>
+                            </div>
+                        </th>
+                        <td><div id="{!LineItem.stud.Name}" class="slds-truncate" aura:id="getlineid" title="{!LineItem.stud.Name}">
+                            <lightning:button variant="base" type="button" onclick="{!c.navigateToDetailPage}" tabindex="{!LineItem.stud.Id}" >
+                                <a id="{!LineItem.stud.Id}" >{!LineItem.stud.Name}</a>
+                            </lightning:button></div></td>
+                        <td><div class="slds-truncate" title="{!LineItem.stud.Name}">{!LineItem.stud.Order_Status__c}</div></td>
+                        <td><div class="slds-truncate" title="{!LineItem.stud.QuickBooks_Invoice_Number__c}">{!LineItem.stud.QuickBooks_Invoice_Number__c}</div></td>
+                        <td><div class="slds-truncate" title="{!LineItem.stud.ProductID__r.Name}">{!LineItem.stud.ProductID__r.Name}</div></td>
+                    </tr>	
+                </aura:iteration> 
+            </tbody> 
+        </table>
+        <lightning:button aura:id="Sync" label="Sync With QuickBooks" class="slds-button slds-button--brand buttontype" onclick="{!c.SynQBO}" />
+        
+        <!-- Modal Success Popup -->
+        
+        <div aria-hidden="false" aura:id="SucId" role="dialog" class="slds-modal slds-fade-in-open slds-hide">
+            <div class="slds-notify_container" style="padding-top: 35px;">
+                <div aura:id="SucIdbackground" class="slds-notify slds-notify--toast slds-theme_error" role="alert">
+                    <span class="slds-assistive-text">Success</span>
+                    <button class="slds-button slds-button--icon-inverse slds-notify__close" onclick="{!c.HideSubPopup}">
+                        <lightning:icon iconName="utility:close" variant="inverse" size="small"/>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <div class="slds-notify__content slds-grid">
+                        <lightning:icon iconName="utility:notification" variant="inverse" size="small" />
+                        <div class="slds-col slds-align-middle" aura:id="SucIdMessage1" style="padding-left: 32px;">
+                            <h2 class="slds-text-heading--small ">{!v.Response}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>	
+            
+        </div>
+    <!-- End of Pop Up -->    
+</aura:component>

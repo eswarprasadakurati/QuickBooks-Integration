@@ -1,0 +1,73 @@
+({
+    updateQuickBooksId:function(component, event) {   
+        //alert("hai");
+        component.set("v.showSpinner",true);
+        var action = component.get("c.UpdateAllitems");
+        action.setParams({ "orderid":component.get("v.recordId")});
+        action.setCallback(this, function(response) { 
+            var state = response.getState();
+            var resp=response.getReturnValue();
+            //alert("response"+resp);
+            console.log("Responce",JSON.stringify(resp));
+            //component.set("v.showSpinner",false);
+            if(state=='SUCCESS'){
+              component.set("v.showSpinner",false);
+            	
+              //alert(response);
+                if(resp=='success'){
+                    var message='Invoices successfully created!';
+                    component.set("v.Response",message);
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        "title": "Success!",
+                        "message": message,
+                        "type":'success'
+                    });
+                    toastEvent.fire();
+                     var dismissActionPanel = $A.get("e.force:closeQuickAction"); 
+						dismissActionPanel.fire();
+                    var delayInMilliseconds = 2000; //1 second
+                    
+                    setTimeout(function() {
+                        window.location.reload();  
+                    }, delayInMilliseconds);
+            /*$A.util.removeClass(component.find('SucIdbackground'), 'slds-theme_error');
+            $A.util.addClass(component.find('SucIdbackground'), 'slds-theme_success');
+            $A.util.removeClass(component.find('SucId'), 'slds-hide');
+            $A.util.addClass(component.find('SucId'), 'slds-show');*/
+                }
+                else if(resp=='failure'){
+                    var message='Error in invoice generation! Please check order status and try again.'
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        "title": "Error!",
+                        "message": message,
+                        "type":'error'
+                    });
+                    toastEvent.fire();
+                    /*component.set("v.Response",message);
+            $A.util.removeClass(component.find('SucIdbackground'), 'slds-theme_success');
+            $A.util.addClass(component.find('SucIdbackground'), 'slds-theme_error');     
+            $A.util.removeClass(component.find('SucId'), 'slds-hide');
+            $A.util.addClass(component.find('SucId'), 'slds-show');*/ 
+                    var delayInMilliseconds = 500; //1 second
+                    
+                    setTimeout(function() {
+                        var dismissActionPanel = $A.get("e.force:closeQuickAction"); 
+						dismissActionPanel.fire();  
+                    }, delayInMilliseconds);
+               
+            }
+               
+            }
+            else{
+                component.set("v.showSpinner",false);
+            }
+            
+        });
+        $A.enqueueAction(action);
+    },
+    HideSubPopup : function(component, event) {
+         window.location.reload();
+     }
+})

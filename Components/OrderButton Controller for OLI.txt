@@ -1,0 +1,149 @@
+({
+    listAction : function(component, event, helper) {
+      
+         var std=component.get("c.listlineorder");
+        	$A.util.removeClass(component.find('tablePart'), 'slds-hide');
+            $A.util.addClass(component.find('tablePart'), 'slds-show');
+   			 
+        std.setParams({
+            
+            "orderid":component.get("v.recordId")
+        });
+        
+        std.setCallback(this,function(response){
+            var state=response.getState();
+            
+            if(state=="SUCCESS")
+            {
+                
+                var resp=response.getReturnValue();
+                var list1=[];
+                for(var i=0;i<resp.length;i++){
+                    list1.push({check:false,stud:resp[i]}) ; 
+                }
+                component.set("v.lstlineitems",list1);
+                //alert(JSON.stringify(list1));
+                console.log(JSON.stringify(resp));
+            }
+            else if(state=="ERROR"){
+                //alert("Error when fetching list ");
+            }
+        });
+        $A.enqueueAction(std);
+        
+    },
+    
+    handleSelectAllLineItems: function(component, event, helper) {
+        var getID = component.get("v.lstlineitems");
+        var checkvalue = component.find("selectAll").get("v.value");        
+        var checkStudent = component.find("checkStudent"); 
+        if(checkvalue == true){
+            for(var i=0; i<checkStudent.length; i++){
+                checkStudent[i].set("v.value",true);
+            }
+        }
+        else{ 
+            for(var i=0; i<checkStudent.length; i++){
+                checkStudent[i].set("v.value",false);
+            }
+        }
+        
+        component.set("v.Selected_LineItems",component.get("v.lstlineitems"));
+    },
+    
+    //Process the selected LineItems
+    handleSelectedLineItems: function(component, event, helper) {
+        var selectedlineitems = [];
+        var checkvalue = component.find("checkStudent");
+        var countofcheck=0;
+        if(!Array.isArray(checkvalue)){
+            if (checkvalue.get("v.value") == true) {
+                selectedlineitems.push(checkvalue.get("v.text"));
+            }
+        }else{
+            for (var i = 0; i < checkvalue.length; i++) {
+                if (checkvalue[i].get("v.value") == true) {
+                    selectedlineitems.push(checkvalue[i].get("v.text"));
+                    countofcheck++;
+                }
+            }
+        }
+        
+        component.set("v.Selected_LineItems",selectedlineitems);
+        var list=component.get("v.lstlineitems");
+        if(countofcheck==list.length){
+            component.set("v.isSelectAll",true);
+        }
+        else if(countofcheck<list.length){
+            component.set("v.isSelectAll",false);
+        }
+         
+    },
+  SynQBO : function(component, event) {
+      //alert("hi");
+      component.set("v.showSpinner",true);
+      var lst=component.get("v.lstlineitems");
+        var lst1=[];
+      	var lst2=[];
+        for(var i=0;i<lst.length;i++){
+            if(lst[i].check){
+                lst1.push(lst[i].stud.Id);
+                lst2.push(lst[i].stud);
+            }
+        }
+      
+      //alert(lst2.length);
+      if(lst2.length==1&&lst2[0].QuickBooks_Invoice_Number__c!=0&&lst2[0].QuickBooks_Invoice_Number__c!=null){
+          //alert("hello1"+lst2[0].QuickBooks_Invoice_Number__c);
+           var response='Invoice number is already generated for the selected line item.Please check and select again.' 
+          component.set("v.Response",response);
+              //alert(response);
+             component.set("v.showSpinner",false);
+            $A.util.removeClass(component.find('SucIdbackground'), 'slds-theme_success');
+            $A.util.addClass(component.find('SucIdbackground'), 'slds-theme_error');
+            $A.util.removeClass(component.find('SucId'), 'slds-hide');
+            $A.util.addClass(component.find('SucId'), 'slds-show');
+             
+      }
+      else{
+          //alert("inside else");
+         var action = component.get("c.updateStatus");
+          action.setParams({
+            lineItemId :   lst1
+        });
+        action.setCallback(this, function(response) { 
+            
+           var state = response.getState();
+            var resp=response.getReturnValue();
+            //alert(state);
+            component.set("v.showSpinner",false);
+            if(state=='SUCCESS'){
+           var response="Invoice is created successfully.Please find the reference in quickbook invoice number field."; 
+          
+            }
+            else response="Error in invoice creation. Please check information field for more info."
+            component.set("v.Response",response);
+            $A.util.removeClass(component.find('SucIdbackground'), 'slds-theme_error');
+            $A.util.addClass(component.find('SucIdbackground'), 'slds-theme_success');
+           $A.util.removeClass(component.find('SucId'), 'slds-hide');
+            $A.util.addClass(component.find('SucId'), 'slds-show'); 
+        });
+        $A.enqueueAction(action);
+   }
+  },
+     HideSubPopup : function(component, event) {
+         $A.util.removeClass(component.find('SucId'), 'slds-show');
+                $A.util.addClass(component.find('SucId'), 'slds-hide');
+         window.location.reload();
+     },
+    navigateToDetailPage : function(elem,event) {
+        var id=event.getSource().get("v.tabindex");
+        //alert(id);
+     var sObjectEvent = $A.get("e.force:navigateToSObject");
+    sObjectEvent.setParams({
+       "recordId": id,
+       "slideDevName": "detail"
+    });
+    sObjectEvent.fire();
+    }  
+})
